@@ -232,12 +232,25 @@ void PR(PCB T[], int size)
 
 int main()
 {
-    char a[5] = "a1", b[5] = "a2",c[5]="a3",d[5]="a4",e[5]="a5";
+    int size=0;
+    char name[10][5];
+    int need[10];
+    PCB T[25],t;
+    cout << "input the number of Progress" << endl;
+    cin >> size;
+    if (size > 0)
+        for (int i = 0; i < size; i++)
+        {
+            cin >> name[i] >> need[i];
+            PCB t(name[i], need[i]);
+            T[i] = t;
+        }
+    else
+        cout << "size error" << endl;
+    /*char a[5] = "a1", b[5] = "a2", c[5] = "a3", d[5] = "a4", e[5] = "a5";
     PCB an(a,3),bn(b,2),cn(c,4), dn(d,2),en(e,1),T[5];
-    int size;
-    T[0] = an,T[1]=bn,T[2]=cn,T[3]=dn,T[4]=en;
-    size = sizeof(T) / sizeof(T[0]);
-    //RR(T,size);                                                       //RR启动
-    //sort(T, T + 5);
-    PR(T, size);
+    //T[0] = an,T[1]=bn,T[2]=cn,T[3]=dn,T[4]=en;
+    //size = sizeof(T) / sizeof(T[0]);*/
+    //RR(T, size);                                                       //RR启动(时间片)
+    //PR(T, size);                                                      //PR启动(优先数算法)
 }

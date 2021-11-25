@@ -1,10 +1,10 @@
-﻿// PCBTest.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
-//Author:绫雪 时间2021/11/20 邮箱：2239301685@qq.com/yaolin6666@gmail.com 
-//操作系统实验作业
-
+﻿//Author:绫雪 时间:2021/11/20 邮箱:2239301685@qq.com/yaolin6666@gmail.com 
+//操作系统实验作业:进程调度
+//RR轮转法 PR优先数法
 #include <iostream>
 #include<cstring>
 #include<algorithm>
+#include<windows.h>
 using namespace std;
 class PCB {
 public:char name[5];
@@ -20,7 +20,10 @@ public:char name[5];
       void PRinfoShow(void);
       bool operator<(const PCB& b)
       {       
-          return this->priority > b.priority;           //正确
+          if (this->priority == b.priority)
+              return this->rest < b.rest;
+          else
+              return this->priority > b.priority;           
           //“<”运算符重载优先数算法使用
       }
 };
@@ -80,7 +83,6 @@ void RR(PCB T[],int size)
         else if (T[0].state != 'F')
         {
             T[0].state = 'R';
-
             cout << "Name\tCPUtime\tNeedTime\tCount\tstate\tround" << endl;
             for (int i = 0; i < size; i++)
             {
@@ -89,16 +91,13 @@ void RR(PCB T[],int size)
             }
             T[0].rest = 0;
             T[0].cputime = T[0].require;
-            T[0].state = 'F';
-            T[0].count++;
-            strcpy_s(F[count], T[0].name);
-            count++;
+            
             flag = 1;
         }
         if (flag == 1)
         {
             cout << "就绪队列:";
-            for (int i = 0; i < size; i++)
+            for (int i = 1; i < size; i++)
             {
                 if (T[i].state == 'W')
                     cout << T[i].name << "\t";
@@ -111,6 +110,12 @@ void RR(PCB T[],int size)
             flag = 0;
             if (T[0].state == 'R')
                 T[0].state = 'W';
+            if (T[0].rest == 0) {
+                T[0].state = 'F';
+                T[0].count++;
+                strcpy_s(F[count], T[0].name);
+                count++;
+            }
             cout << endl << endl;
         }
         temp = T[0];
@@ -123,7 +128,7 @@ void RR(PCB T[],int size)
             break;
     }
     cout << "Name\tCPUtime\tNeedTime\tCount\tstate\tround" << endl;
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < size; i++)
     {
         T[i].RRinfoShow();
         cout << "2" << endl;
@@ -179,15 +184,9 @@ void PR(PCB T[], int size)
             }
             T[0].rest = 0;
             T[0].cputime = T[0].require;
-            T[0].state = 'F';
-            T[0].count++;
-            strcpy_s(F[count], T[0].name);
-            count++;
-            cursors--;
-            flag = 1;
         }
         cout << "就绪队列:";
-        for (int i = 0; i < size; i++)
+        for (int i = 1; i < size; i++)
         {
             if (T[i].state == 'W')
                 cout << T[i].name << "\t";
@@ -198,6 +197,14 @@ void PR(PCB T[], int size)
             cout << F[i] << "\t";
         }
         cout << endl<<endl<<endl;
+        if (T[0].rest == 0) {
+            T[0].state = 'F';
+            T[0].count++;
+            strcpy_s(F[count], T[0].name);
+            count++;
+            cursors--;
+            flag = 1;
+        }
         if (T[0].state == 'F')
         {
             temp = T[0];
@@ -234,25 +241,27 @@ void PR(PCB T[], int size)
 int main()
 {
     int size=0;
-    char name[10][5];
-    int need[10];
+    char name[5];
+    int need,i=0;
     PCB T[25],t;
     //cout << "input the number of Progress" << endl;
     //cin >> size;                                                                      //进程数量最大支持25
-    size = 5;
+    //size = 5;
     cout << "input name and needtime"<<endl;
-    if (size > 0)
-        for (int i = 0; i < size; i++)
+    while (cin >> name)
+    {
+        cin >> need;
+        PCB t(name, need);
+        T[i] = t;
+        size++;
+        i++;
+        if (size > 10)
         {
-            cin >> name[i] >> need[i];
-            PCB t(name[i], need[i]);
-            T[i] = t;
+            size = 10;
+            break;
         }
-    else
-        cout << "size error" << endl;
-    
-    
-    
+    }
+
     /*char a[5] = "a1", b[5] = "a2", c[5] = "a3", d[5] = "a4", e[5] = "a5";
     PCB an(a,3),bn(b,2),cn(c,4), dn(d,2),en(e,1),T[5];
     //T[0] = an,T[1]=bn,T[2]=cn,T[3]=dn,T[4]=en;
@@ -260,6 +269,7 @@ int main()
 
 
 
-    RR(T, size);                                                       //RR启动(时间片)
+    //RR(T, size);                                                       //RR启动(时间片)
     PR(T, size);                                                      //PR启动(优先数算法)
+    //Sleep(5000);
 }
